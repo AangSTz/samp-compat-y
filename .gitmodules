@@ -1,6 +1,6 @@
 [submodule "lib/samp-plugin-sdk"]
 	path = lib/samp-plugin-sdk
-	url = https://github.com/AmyrAhmady/samp-plugin-sdk
+	url = https://github.com/udan11/samp-plugin-sdk
 [submodule "lib/cmake-modules"]
 	path = lib/cmake-modules
 	url = https://github.com/samp-forks/cmake-modules
