@@ -1,41 +1,62 @@
-name: Update Submodule URL
+name: Build Plugin
 
 on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
   workflow_dispatch:
-    inputs:
-      submodule_path:
-        description: 'Pilih submodule yang ingin diubah URL-nya'
-        required: true
-        type: choice
-        options:
-          - lib/cmake-modules
-          - lib/samp-plugin-sdk
-          - lib/subhook
-      new_url:
-        description: 'URL repositori baru'
-        required: true
-        type: string
 
 jobs:
-  update-url:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
+  build-windows:
+    runs-on: windows-2022
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive # Otomatis mendownload semua submodule secara bersih
 
-      - name: Update URL in .gitmodules
-        run: |
-          git config --file=.gitmodules submodule.${{ github.event.inputs.submodule_path }}.url "${{ github.event.inputs.new_url }}"
-          git submodule sync
+      - name: Configure CMake (Windows 32-bit)
+        run: cmake -B build -A Win32 -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 
-      - name: Commit and Push Changes
+      - name: Build Plugin
+        run: cmake --build build --config Release
+
+      - name: Upload Artifact Windows
+        uses: actions/upload-artifact@v7
+        with:
+          name: plugin-windows
+          path: test/plugins/**/*.dll
+          if-no-files-found: error
+
+  build-linux:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive # Otomatis mendownload semua submodule secara bersih
+
+      - name: Install 32-bit toolchain
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          
-          git add .gitmodules
-          git commit -m "chore: update url for ${{ github.event.inputs.submodule_path }}" || echo "URL sama, tidak ada yang diubah."
-          git push origin master
+          sudo apt-get update
+          sudo apt-get install -y gcc-multilib g++-multilib
+
+      - name: Configure CMake (Linux 32-bit)
+        # Menggunakan path folder amx secara eksplisit untuk mengatasi error sclinux.h
+        run: >
+          cmake -B build 
+          -DCMAKE_BUILD_TYPE=Release 
+          -DCMAKE_POLICY_VERSION_MINIMUM=3.5 
+          -DCMAKE_CXX_FLAGS="-I${{ github.workspace }}/lib/samp-plugin-sdk/amx" 
+          -DCMAKE_C_FLAGS="-I${{ github.workspace }}/lib/samp-plugin-sdk/amx"
+
+      - name: Build Plugin
+        run: cmake --build build
+
+      - name: Upload Artifact Linux
+        uses: actions/upload-artifact@v7
+        with:
+          name: plugin-linux
+          path: test/plugins/**/*.so
+          if-no-files-found: error
