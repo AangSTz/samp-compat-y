@@ -13,10 +13,17 @@ jobs:
     # Kode plugin lama lebih aman di VS 2022, jadi dipin ke windows-2022.
     runs-on: windows-2022
     steps:
-      - name: Checkout Code (termasuk submodule)
+      - name: Checkout Code
         uses: actions/checkout@v6
-        with:
-          submodules: recursive
+        # Submodule sengaja tidak diambil: commit yang di-pin repo sudah hilang dari remote.
+
+      - name: Ambil dependensi (pengganti submodule)
+        shell: bash
+        run: |
+          rm -rf lib/cmake-modules lib/samp-plugin-sdk lib/subhook
+          git clone --depth 1 https://github.com/samp-forks/cmake-modules lib/cmake-modules
+          git clone --depth 1 https://github.com/AmyrAhmady/samp-plugin-sdk lib/samp-plugin-sdk
+          git clone --depth 1 https://github.com/BangL/subhook lib/subhook
 
       - name: Configure CMake (Windows 32-bit)
         run: cmake -B build -A Win32 -DCMAKE_POLICY_VERSION_MINIMUM=3.5
@@ -28,17 +35,24 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: plugin-windows
-          # CMakeLists.txt memaksa output ke test/plugins (bisa ada subfolder Release)
+          # CMakeLists.txt memaksa output ke test/plugins
           path: test/plugins/**/*.dll
           if-no-files-found: error
 
   build-linux:
     runs-on: ubuntu-24.04
     steps:
-      - name: Checkout Code (termasuk submodule)
+      - name: Checkout Code
         uses: actions/checkout@v6
-        with:
-          submodules: recursive
+        # Submodule sengaja tidak diambil: commit yang di-pin repo sudah hilang dari remote.
+
+      - name: Ambil dependensi (pengganti submodule)
+        shell: bash
+        run: |
+          rm -rf lib/cmake-modules lib/samp-plugin-sdk lib/subhook
+          git clone --depth 1 https://github.com/samp-forks/cmake-modules lib/cmake-modules
+          git clone --depth 1 https://github.com/AmyrAhmady/samp-plugin-sdk lib/samp-plugin-sdk
+          git clone --depth 1 https://github.com/BangL/subhook lib/subhook
 
       - name: Install 32-bit toolchain
         run: |
