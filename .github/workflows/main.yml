@@ -22,7 +22,7 @@ jobs:
         run: |
           rm -rf lib/cmake-modules lib/samp-plugin-sdk lib/subhook
           git clone --depth 1 https://github.com/samp-forks/cmake-modules lib/cmake-modules
-          git clone --depth 1 https://github.com/AmyrAhmady/samp-plugin-sdk lib/samp-plugin-sdk
+          git clone --depth 1 https://github.com/udan11/samp-plugin-sdk lib/samp-plugin-sdk
           git clone --depth 1 https://github.com/BangL/subhook lib/subhook
 
       - name: Configure CMake (Windows 32-bit)
@@ -51,7 +51,7 @@ jobs:
         run: |
           rm -rf lib/cmake-modules lib/samp-plugin-sdk lib/subhook
           git clone --depth 1 https://github.com/samp-forks/cmake-modules lib/cmake-modules
-          git clone --depth 1 https://github.com/AmyrAhmady/samp-plugin-sdk lib/samp-plugin-sdk
+          git clone --depth 1 https://github.com/udan11/samp-plugin-sdk lib/samp-plugin-sdk
           git clone --depth 1 https://github.com/BangL/subhook lib/subhook
 
       - name: Install 32-bit toolchain
