@@ -1,0 +1,51 @@
+name: Build Plugin
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        # Kita matikan fitur submodule otomatis di sini
+        
+      - name: Configure CMake (Windows 32-bit)
+        run: cmake -B build -A Win32
+
+      - name: Build Plugin
+        run: cmake --build build --config Release
+
+      - name: Upload Artifact Windows
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-windows
+          path: build/Release/*.dll
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install 32-bit Dependencies
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get install -y gcc-multilib g++-multilib
+
+      - name: Configure CMake (Linux 32-bit)
+        run: cmake -B build -DCMAKE_C_FLAGS="-m32" -DCMAKE_CXX_FLAGS="-m32"
+
+      - name: Build Plugin
+        run: cmake --build build --config Release
+
+      - name: Upload Artifact Linux
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-linux
+          path: build/*.so
