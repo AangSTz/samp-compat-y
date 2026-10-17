@@ -3,7 +3,7 @@
 	url = https://github.com/udan11/samp-plugin-sdk
 [submodule "lib/cmake-modules"]
 	path = lib/cmake-modules
-	url = https://github.com/samp-forks/cmake-modules
+	url = https://github.com/AmyrAhmady/samp-cmake-modules
 [submodule "lib/subhook"]
 	path = lib/subhook
 	url = https://github.com/BangL/subhook
